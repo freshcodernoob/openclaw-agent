@@ -31,8 +31,12 @@ def _pump(proc, name):
 
 def spawn(cmd, name, env=None):
     proc = subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-        text=True, bufsize=1, env=env,
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        bufsize=1,
+        env=env,
     )
     t = threading.Thread(target=_pump, args=(proc, name), daemon=True)
     t.start()
@@ -98,9 +102,11 @@ def node_version():
 
 if node_version() < (22, 16):
     log(f"Node too old/missing ({node_version()}). Installing Node 24...")
-    run(["bash", "-c",
+    run(
+        ["bash", "-c",
          "curl -fsSL https://deb.nodesource.com/setup_24.x | bash - && apt-get install -y nodejs"],
-        "node-install")
+        "node-install",
+    )
 log(f"Node version: {node_version()}")
 
 
@@ -118,6 +124,7 @@ os.makedirs(STATE_DIR, exist_ok=True)
 if HF_TOKEN:
     try:
         from huggingface_hub import snapshot_download
+
         log("Pulling OpenClaw state from Hugging Face...")
         snapshot_download(
             repo_id="reikai/openclaw-state",
@@ -136,25 +143,33 @@ else:
 # ---------- 5. Cloudflare Tunnel ----------
 cloudflared_path = "/tmp/cloudflared"
 if not os.path.exists(cloudflared_path):
-    run(["curl", "-fsSL", "--output", cloudflared_path,
+    run(
+        ["curl", "-fsSL", "--output", cloudflared_path,
          "https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64"],
-        "cloudflared-download")
+        "cloudflared-download",
+    )
     run(["chmod", "+x", cloudflared_path], "chmod")
 
 
 def start_tunnel():
-    return spawn([cloudflared_path, "--no-autoupdate", "tunnel", "run", "--token", CLOUDFLARE_TUNNEL_TOKEN],
-                 "tunnel")
+    return spawn(
+        [cloudflared_path, "--no-autoupdate", "tunnel", "run", "--token", CLOUDFLARE_TUNNEL_TOKEN],
+        "tunnel",
+    )
 
 
 tunnel_process = None
 if CLOUDFLARE_TUNNEL_TOKEN:
     tunnel_process = start_tunnel()
-    # Tell the gateway the local Cloudflare tunnel is a trusted proxy
-run(["openclaw", "config", "set", "gateway.trustedProxies", '["127.0.0.1", "::1"]'], "config-trusted-proxies")
-run(["openclaw", "config", "set", "gateway.mode", "local"], "config-mode")
-    log(f"Cloudflare Tunnel launched. In the Cloudflare dashboard the public hostname must point to "
-        f"http://localhost:{GATEWAY_PORT}")
+    run(
+        ["openclaw", "config", "set", "gateway.trustedProxies", '["127.0.0.1", "::1"]'],
+        "config-trusted-proxies",
+    )
+    run(["openclaw", "config", "set", "gateway.mode", "local"], "config-mode")
+    log(
+        f"Cloudflare Tunnel launched. In the Cloudflare dashboard the public hostname must point to "
+        f"http://localhost:{GATEWAY_PORT}"
+    )
 else:
     log("WARNING: CLOUDFLARE_TUNNEL_TOKEN is missing - no public URL will work.")
 
@@ -168,7 +183,8 @@ def start_gateway():
          "--bind", "loopback",
          "--auth", "token",
          "--allow-unconfigured"],
-        "gateway", env=env,
+        "gateway",
+        env=env,
     )
 
 
