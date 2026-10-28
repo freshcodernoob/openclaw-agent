@@ -211,6 +211,10 @@ log(f"Starting OpenClaw gateway on port {GATEWAY_PORT}...")
 gateway_process = start_gateway()
 if wait_healthy(gateway_process):
     log("Gateway is healthy.")
+    run(
+        ["openclaw", "devices", "approve", "ba2176db-232f-48b9-bd1c-981d69a6ada9"],
+        "approve-device",
+    )
 else:
     log("Gateway did NOT become healthy - check the [gateway] lines above for the real error.")
 
