@@ -85,14 +85,15 @@ if os.path.exists("package.json"):
     print("Building OpenClaw application...", flush=True)
     subprocess.run(["npm", "run", "build"], check=False)
 
+# --- Update Port Assignment ---
 env = os.environ.copy()
-env["PORT"] = "3000"
+env["PORT"] = "18789"
 if GEMINI_API_KEY:
     env["GEMINI_API_KEY"] = GEMINI_API_KEY
 
-print("Starting OpenClaw service on port 3000...", flush=True)
+print("Starting OpenClaw service on port 18789...", flush=True)
 openclaw_process = subprocess.Popen(
-    ["npm", "run", "start"],
+    ["npm", "run", "start", "--", "-p", "18789"],
     stdout=log_file,
     stderr=log_file,
     env=env
