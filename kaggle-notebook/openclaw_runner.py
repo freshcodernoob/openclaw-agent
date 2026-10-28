@@ -166,6 +166,10 @@ if CLOUDFLARE_TUNNEL_TOKEN:
         "config-trusted-proxies",
     )
     run(["openclaw", "config", "set", "gateway.mode", "local"], "config-mode")
+    run(
+        ["openclaw", "config", "set", "gateway.controlUi.allowedOrigins", '["https://openclaw.kiyumi.online"]'],
+        "config-origins",
+    )
     log(
         f"Cloudflare Tunnel launched. In the Cloudflare dashboard the public hostname must point to "
         f"http://localhost:{GATEWAY_PORT}"
