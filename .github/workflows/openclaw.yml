@@ -54,4 +54,4 @@ jobs:
 
       - name: Push Kernel to Kaggle
         run: |
-          kaggle kernels push -p .
+          kaggle kernels push -p ./kaggle-notebook
