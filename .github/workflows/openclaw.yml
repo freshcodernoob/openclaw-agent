@@ -23,27 +23,35 @@ jobs:
         run: pip install kaggle
 
       - name: Configure Kaggle Credentials Safely
-  env:
-    KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
-    KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
-  run: |
-  
-    python3 -c '
-    import os, json, pathlib
-    kaggle_dir = pathlib.Path.home() / ".kaggle"
-    kaggle_dir.mkdir(parents=True, exist_ok=True)
-    creds = {
-        "username": os.environ.get("KAGGLE_USERNAME", "").strip(),
-        "key": os.environ.get("KAGGLE_KEY", "").strip()
-    }
-    if not creds["username"] or not creds["key"]:
-        print("ERROR: Kaggle username or key is empty!")
-        exit(1)
-    with open(kaggle_dir / "kaggle.json", "w") as f:
-        json.dump(creds, f)
-    os.chmod(kaggle_dir / "kaggle.json", 0o600)
-    print("Kaggle credentials configured successfully.")
-    
-     - name: Push Kernel to Kaggle
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import pathlib
+
+          kaggle_dir = pathlib.Path.home() / ".kaggle"
+          kaggle_dir.mkdir(parents=True, exist_ok=True)
+
+          creds = {
+              "username": os.environ.get("KAGGLE_USERNAME", "").strip(),
+              "key": os.environ.get("KAGGLE_KEY", "").strip(),
+          }
+
+          if not creds["username"] or not creds["key"]:
+              print("ERROR: Kaggle username or key is empty!")
+              raise SystemExit(1)
+
+          kaggle_json = kaggle_dir / "kaggle.json"
+          with kaggle_json.open("w") as f:
+              json.dump(creds, f)
+
+          os.chmod(kaggle_json, 0o600)
+          print("Kaggle credentials configured successfully.")
+          PY
+
+      - name: Push Kernel to Kaggle
         run: |
           kaggle kernels push -p .
