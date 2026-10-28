@@ -1,0 +1,16 @@
+{
+  "id": "kiyumi2/openclaw-runner",
+  "title": "openclaw-runner",
+  "code_file": "openclaw_runner.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": false,
+  "enable_tpu": false,
+  "enable_internet": true,
+  "dataset_sources": [
+    "kiyumi2/keys-env"
+  ],
+  "kernel_sources": [],
+  "competition_sources": []
+}
