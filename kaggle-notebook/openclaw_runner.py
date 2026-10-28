@@ -98,7 +98,7 @@ openclaw_process = subprocess.Popen(
     stderr=log_file,
     env=env
 )
-print("OpenClaw background service initiated on port 3000.", flush=True)
+print("OpenClaw background service initiated on port 18789.", flush=True)
 
 # 4. Keep-Alive Loop (Prevents Kaggle container exit)
 print("=== OPENCLAW RUNNER FULLY ACTIVE. ENTERING KEEP-ALIVE LOOP ===", flush=True)
