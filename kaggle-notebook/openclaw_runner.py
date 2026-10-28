@@ -150,6 +150,9 @@ def start_tunnel():
 tunnel_process = None
 if CLOUDFLARE_TUNNEL_TOKEN:
     tunnel_process = start_tunnel()
+    # Tell the gateway the local Cloudflare tunnel is a trusted proxy
+run(["openclaw", "config", "set", "gateway.trustedProxies", '["127.0.0.1", "::1"]'], "config-trusted-proxies")
+run(["openclaw", "config", "set", "gateway.mode", "local"], "config-mode")
     log(f"Cloudflare Tunnel launched. In the Cloudflare dashboard the public hostname must point to "
         f"http://localhost:{GATEWAY_PORT}")
 else:
