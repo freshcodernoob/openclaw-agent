@@ -1,0 +1,49 @@
+name: Run OpenClaw Agent on Kaggle
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */11 * * *'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Kaggle API
+        run: pip install kaggle
+
+      - name: Configure Kaggle Credentials Safely
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+        run: |
+          python3 -c '
+          import os, json, pathlib
+          kaggle_dir = pathlib.Path.home() / ".kaggle"
+          kaggle_dir.mkdir(parents=True, exist_ok=True)
+          creds = {
+              "username": os.environ.get("KAGGLE_USERNAME", "").strip(),
+              "key": os.environ.get("KAGGLE_KEY", "").strip()
+          }
+          if not creds["username"] or not creds["key"]:
+              print("ERROR: Kaggle username or key is empty!")
+              exit(1)
+          with open(kaggle_dir / "kaggle.json", "w") as f:
+              json.dump(creds, f)
+          os.chmod(kaggle_dir / "kaggle.json", 0o600)
+          print("Kaggle credentials configured successfully.")
+          '
+
+      - name: Push Kernel to Kaggle
+        run: |
+          kaggle kernels push -p .
